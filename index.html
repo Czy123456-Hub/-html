@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Workflow Test</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, "Microsoft YaHei", sans-serif;
+        background: #f6f7f9;
+        color: #1f2937;
+      }
+
+      main {
+        width: min(680px, calc(100% - 32px));
+      }
+
+      pre {
+        padding: 16px;
+        overflow: auto;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #ffffff;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Workflow Test</h1>
+      <pre id="log">Waiting for workflow-run.txt...</pre>
+    </main>
+    <script>
+      fetch(`workflow-run.txt?cache=${Date.now()}`)
+        .then((response) => response.ok ? response.text() : "No workflow run has been recorded yet.")
+        .then((text) => {
+          document.getElementById("log").textContent = text;
+        })
+        .catch(() => {
+          document.getElementById("log").textContent = "No workflow run has been recorded yet.";
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+name: Beijing 09:50 Workflow Test
+
+on:
+  schedule:
+    # 09:50 Beijing time = 01:50 UTC
+    - cron: "50 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: beijing-0950-workflow-test
+  cancel-in-progress: false
+
+jobs:
+  record-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Record workflow run time
+        run: |
+          {
+            echo "Workflow ran successfully."
+            echo "Beijing time: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S %Z')"
+            echo "UTC time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "Run ID: ${GITHUB_RUN_ID}"
+            echo "Run URL: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          } > workflow-run.txt
+
+      - name: Commit result if changed
+        run: |
+          if [ -z "$(git status --porcelain workflow-run.txt)" ]; then
+            echo "No workflow-run.txt changes to publish."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add workflow-run.txt
+          git commit -m "Record Beijing 09:50 workflow run"
+          git push
